@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import List from './List';
+import List from './List.tsx';
 import Alert from './Alert';
 
 interface Item {
