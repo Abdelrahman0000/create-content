@@ -1,109 +1,19 @@
-// import React, { useEffect, useState } from 'react'
-// import List from './List';
-// import Alert from './Alert'
-
-// const mylocelstorage=()=>{
-// let list =localStorage.getItem('list');
-// if(list){
-//   return JSON.parse(localStorage.getItem('list'))
-// }
-// else{
-//   return [];
-// }
-
-// }
-
-// export default function CreateContent() {
-// const [name,setName]=useState('');
-// const[list,setlist]=useState(mylocelstorage());
-// const [edit,setEdit]=useState(false);
-// const[editID,setEditID]=useState(null)
-// const [alert,setAlert]=useState({show:false,msg:'',type:''})
-// const handelevent=(e)=>{
-// e.preventDefault();
-// if(!name){
-//   showalert(true,'danger','please enter value')
-// }
-// else if(name && edit){
-// setlist(
-//   list.map((item)=>{
-//     if(item.id===editID){
-//       return({...item,title:name})
-//     }
-//     return item;
-//   })
-// )
-// setName('');
-// setEditID(null);
-// setEdit(false)
-// showalert(true,'success','value changed')
-// }
-// else{
-//   showalert(true,'success','item added to list')
-//   const newitem={id: new Date().getTime().toString(),
-//   title:name
-//   }
-//   setlist([...list,newitem]);
-//   setName('');
-// }
-// }
-// const showalert=(show=false,type='',msg='')=>{
-//   setAlert({show,msg,type});
-// }
-// const clearlist=()=>{ showalert(true,'danger','empty list')
-// setlist([])
-// }
-// const removeitem=(id)=>{
-//   showalert(true,'danger','item removed');
-//   const newlist=list.filter((item)=>item.id !==id);
-//   setlist(newlist)
-// }
-// const editItem=(id)=>{
-// const spicefcitem=list.find((item)=>item.id ===id);
-// setEdit(true)
-// setEditID(id);
-// setName(spicefcitem.title)
-// }
-// useEffect(()=>{
-//   localStorage.setItem('list',JSON.stringify(list))
-// },[list])
-//   return (
-//  <section className='section-center' >
-//      <form className='grocery-form' onSubmit={handelevent}>
-//        {alert.show&&<Alert {...alert} removeallert={showalert} list={list} />}
-//        <h3>grocery bud</h3>
-//        <div className='form-control'>
-//          <input className='grocery' type='text' placeholder='e.g. eggs' value={name} onChange={(e)=>setName(e.target.value)} />
-//          <button type='submit' className='submit-btn' >
-//            {edit?'edit':'submit'}
-//          </button>
-//        </div>
-//      </form>
-//      { list.length>0 &&
-//      <div className='grocery-container'>
-//          <List item={list} removeitem={removeitem} edit={editItem} />
-//          <button className='clear-btn' onClick={clearlist}>clear items</button>
-//      </div>
-// }
-//  </section>
-//   )
-// }
-
-
-
-
-
-
-
 
 import React, { useEffect, useState } from 'react';
 import List from './List';
 import Alert from './Alert';
 
-const myLocalStorage = () => {
+interface Item {
+  id: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+}
+
+const myLocalStorage = (): Item[] => {
   let list = localStorage.getItem('list');
   if (list) {
-    return JSON.parse(localStorage.getItem('list'));
+    return JSON.parse(list);
   } else {
     return [];
   }
@@ -114,19 +24,18 @@ export default function CreateContent() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [status, setStatus] = useState('');
-  const [list, setList] = useState(myLocalStorage());
+  const [list, setList] = useState<Item[]>(myLocalStorage());
   const [edit, setEdit] = useState(false);
-  const [editID, setEditID] = useState(null);
+  const [editID, setEditID] = useState<string | null>(null);
   const [alert, setAlert] = useState({ show: false, msg: '', type: '' });
 
-  
-  const handleEvent = (e) => {
+  const handleEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!firstName || !lastName || !status) {
       showAlert(true, 'danger', 'Please enter all values');
     } else if (firstName && lastName && status && edit) {
-      setList(
-        list.map((item) => {
+      setList((prevList) =>
+        prevList.map((item) => {
           if (item.id === editID) {
             return { ...item, firstName, lastName, status };
           }
@@ -143,13 +52,13 @@ export default function CreateContent() {
     } else {
       setShowBox(false);
       showAlert(true, 'success', 'Item added to list');
-      const newItem = {
+      const newItem: Item = {
         id: new Date().getTime().toString(),
         firstName,
         lastName,
         status,
       };
-      setList([...list, newItem]);
+      setList((prevList) => [...prevList, newItem]);
       setFirstName('');
       setLastName('');
       setStatus('');
@@ -166,20 +75,22 @@ export default function CreateContent() {
     setShowBox(false);
   };
 
-  const removeItem = (id) => {
+  const removeItem = (id: string) => {
     showAlert(true, 'danger', 'Item removed');
     const newList = list.filter((item) => item.id !== id);
     setList(newList);
   };
 
-  const editItem = (id) => {
+  const editItem = (id: string) => {
     const specificItem = list.find((item) => item.id === id);
-    setEdit(true);
-    setEditID(id);
-    setFirstName(specificItem.firstName);
-    setLastName(specificItem.lastName);
-    setStatus(specificItem.status);
-    setShowBox(true); // Show the form when editing
+    if (specificItem) {
+      setEdit(true);
+      setEditID(id);
+      setFirstName(specificItem.firstName);
+      setLastName(specificItem.lastName);
+      setStatus(specificItem.status);
+      setShowBox(true); // Show the form when editing
+    }
   };
 
   useEffect(() => {
@@ -194,7 +105,7 @@ export default function CreateContent() {
 
       <section className={`FormBox`} style={{ display: showBox ? 'block' : 'none' }}>
         <form className='grocery-form' onSubmit={handleEvent}>
-          {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
+          {alert.show && <Alert {...alert} removeAlert={showAlert}  />}
           <h3>Grocery Bud</h3>
           <div className='form-control'>
             <input
@@ -212,7 +123,7 @@ export default function CreateContent() {
               onChange={(e) => setLastName(e.target.value)}
             />
             <div className='check-inner'>
-              <p style={{marginLeft:'9px'}}> status: </p>
+              <p style={{ marginLeft: '9px' }}> status: </p>
               <label>
                 <input
                   type='checkbox'
@@ -248,9 +159,3 @@ export default function CreateContent() {
     </section>
   );
 }
-
-
-
-
-
-

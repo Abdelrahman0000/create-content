@@ -1,37 +1,23 @@
-// import React from 'react'
-// import{FaEdit,FaTrash} from'react-icons/fa'
-// export default function List({item,removeitem,edit}) {
-    
-//   return (
-//     <div className='grocery-list'>
-// {item.map((x)=>{
-//     const {id,title}=x;
-//     return(<article className='grocery-item' >
-//         <p className='title'>{title}</p>
-//         <div className='btn-container'>
-// <button className='edit-btn' type='button' onClick={()=>{
-//     edit(id)
-//    }} >
-//     <FaEdit />
-// </button>
-// <button className='delete-btn' type='button' onClick={()=>removeitem(id)} >
-//     <FaTrash />
-// </button>
-// </div>
-//     </article>)
-// })}
-//     </div>
-//   )
-// }
-
-
-
 
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
-export default function List({ items, removeItem, editItem, setShowBox }) {
-  const editItem1 = (id) => {
+interface Item {
+  id: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+}
+
+interface Props {
+  items: Item[];
+  removeItem: (id: string) => void;
+  editItem: (id: string) => void;
+  setShowBox: (show: boolean) => void;
+}
+
+export default function List({ items, removeItem, editItem, setShowBox }: Props) {
+  const editItem1 = (id: string) => {
     editItem(id);
     setShowBox(true);
   };
@@ -43,17 +29,17 @@ export default function List({ items, removeItem, editItem, setShowBox }) {
         return (
           <article className='grocery-item' key={id}>
             <p className='title'>
-          fullname :    {firstName} {lastName}
+              fullname : {firstName} {lastName}
             </p>
 
-            <div className='status-container'> <span style={{color:'#F465A8'}}> status : </span>
+            <div className='status-container'>
+              <span style={{ color: '#F465A8' }}>status : </span>
               {status === 'active' ? (
-                <span className='status-active'></span> 
+                <span className='status-active'></span>
               ) : (
                 <span className='status-inactive'>Inactive</span>
               )}
             </div>
-
 
             <div className='btn-container'>
               <button
@@ -71,7 +57,6 @@ export default function List({ items, removeItem, editItem, setShowBox }) {
                 <FaTrash />
               </button>
             </div>
-          
           </article>
         );
       })}

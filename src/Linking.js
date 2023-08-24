@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import CreateContent from './CreateContent';
+import CreateContent from './CreateContent.tsx';
 import MapForCovide from './MapForCovide';
 import Sidebar from './Sidebar.jsx';
 
